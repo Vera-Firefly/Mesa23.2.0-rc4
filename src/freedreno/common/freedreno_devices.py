@@ -516,7 +516,7 @@ add_gpus([
         )
     ))
 
-a7xx_base = A6XXProps(
+a7xx_base = dict(
         has_gmem_fast_clear = True,
         has_hw_multiview = True,
         has_fs_tex_prefetch = True,
@@ -560,14 +560,12 @@ a7xx_base = A6XXProps(
         has_early_preamble = True,
     )
 
-a7xx_gen2 = A7XXProps(
+a7xx_gen2 = dict(
         stsc_duplication_quirk = True,
         has_event_write_sample_count = True,
         ubwc_unorm_snorm_int_compatible = True,
         supports_ibo_ubwc = True,
         fs_must_have_non_zero_constlen_quirk = True,
-        # Most devices with a740 have blob v6xx which doesn't have
-        # this hint set. Match them for better compatibility by default.
         enable_tp_ubwc_flag_hint = False,
         has_64b_ssbo_atomics = True,
     )
