@@ -1,7 +1,7 @@
 name: Android CI
 
 on:
-  pull:
+  push:
   pull_request:
   workflow_dispatch:
 
