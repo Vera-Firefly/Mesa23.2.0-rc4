@@ -573,8 +573,8 @@ a7xx_gen2 = dict(
 add_gpus([
         GPUId(chip_id=0x43030B00, name="FD735")
     ], A6xxGPUInfo(
-        CHIP.A7XX,
-        [a7xx_base, a7xx_gen2],
+        CHIP.A6XX,
+        a6xx_gen4,
         num_ccu = 3,
         tile_align_w = 96,
         tile_align_h = 32,
