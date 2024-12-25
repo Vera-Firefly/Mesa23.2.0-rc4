@@ -578,10 +578,6 @@ add_gpus([
         num_ccu = 3,
         tile_align_w = 96,
         tile_align_h = 32,
-        num_vsc_pipes = 32,
-        cs_shared_mem_size = 32 * 1024,
-        wave_granularity = 2,
-        fibers_per_sp = 128 * 2 * 16,
         magic_regs = dict(
             TPL1_DBG_ECO_CNTL = 0x11100000,
             GRAS_DBG_ECO_CNTL = 0x00004800,
