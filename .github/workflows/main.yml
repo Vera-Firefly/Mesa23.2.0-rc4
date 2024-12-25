@@ -1,0 +1,61 @@
+name: Android CI
+
+on:
+  pull:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        arch: ["aarch64"]
+      fail-fast: false
+
+    name: "Build for Arm64"
+    runs-on: ubuntu-latest
+    steps:   
+      - uses: actions/checkout@v4
+
+      - name: Set Up Environment
+        run: |
+          sudo apt update
+          sudo apt install -y libxrandr-dev libxxf86vm-dev libxcb-*-dev libx11-xcb-dev libxfixes-dev libdrm-dev libx11-dev
+          pip3 install mako meson ninja
+
+      - name: Set ndkver,sdkver and work_dir
+        run: |
+          echo "NDK_VER=android-ndk-r27c" >> $GITHUB_ENV
+          echo "SDK_VER=33" >> $GITHUB_ENV
+          echo "WORK_DIR=$(pwd)" >> $GITHUB_ENV
+
+      - name: Download and extract NDK
+        run: |
+          echo "Downloading android-ndk from google server ..."
+          curl https://dl.google.com/android/repository/${NDK_VER}-linux.zip --output ${NDK_VER}-linux.zip &> /dev/null
+          echo "Extracting android-ndk to a folder ..."
+          unzip ${NDK_VER}-linux.zip &> /dev/null
+
+      - name: Build
+        run: |
+          envsubst <android-${{matrix.arch}} >build-crossfile
+          git clone https://gitlab.freedesktop.org/mesa/mesa
+          meson setup "build-android" \
+            --cross-file "build-crossfile" \
+            -Dbuildtype=release \
+            --prefix=/tmp/mesa \
+            -Dplatforms=android \
+            -Dplatform-sdk-version=33 \
+            -Dandroid-stub=true \
+            -Dgallium-drivers= \
+            -Dvulkan-drivers=freedreno \
+            -Dfreedreno-kmds=kgsl \
+            -Db_lto=true
+          ninja -C "build-android" install
+          mkdir /tmp/mesa/turnip
+          cp /tmp/mesa/lib/libvulkan_freedreno.so /tmp/mesa/turnip/libvulkan_freedreno.so
+      - name: Upload Turnip
+        uses: actions/upload-artifact@v4
+        with:
+          name: Turnip
+          path: /tmp/mesa/turnip/libvulkan_freedreno.so
