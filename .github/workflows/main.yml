@@ -39,7 +39,6 @@ jobs:
       - name: Build
         run: |
           envsubst <android-${{matrix.arch}} >build-crossfile
-          git clone https://gitlab.freedesktop.org/mesa/mesa
           meson setup "build-android" \
             --cross-file "build-crossfile" \
             -Dbuildtype=release \

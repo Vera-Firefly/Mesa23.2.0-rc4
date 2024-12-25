@@ -516,6 +516,141 @@ add_gpus([
         )
     ))
 
+a7xx_base = A6XXProps(
+        has_gmem_fast_clear = True,
+        has_hw_multiview = True,
+        has_fs_tex_prefetch = True,
+        has_sampler_minmax = True,
+
+        supports_double_threadsize = True,
+
+        sysmem_per_ccu_depth_cache_size = 256 * 1024,
+        sysmem_per_ccu_color_cache_size = 64 * 1024,
+        gmem_ccu_color_cache_fraction = CCUColorCacheFraction.EIGHTH.value,
+
+        prim_alloc_threshold = 0x7,
+        vs_max_inputs_count = 32,
+        max_sets = 8,
+
+        reg_size_vec4 = 96,
+        # Blob limits it to 128 but we hang with 128
+        instr_cache_size = 127,
+        supports_multiview_mask = True,
+        has_z24uint_s8uint = True,
+        tess_use_shared = True,
+        storage_16bit = True,
+        has_tex_filter_cubic = True,
+        has_separate_chroma_filter = True,
+        has_sample_locations = True,
+        has_lpac = True,
+        has_shading_rate = True,
+        has_getfiberid = True,
+        has_dp2acc = True,
+        has_dp4acc = True,
+        enable_lrz_fast_clear = True,
+        has_lrz_dir_tracking = True,
+        has_lrz_feedback = True,
+        has_per_view_viewport = True,
+        line_width_min = 1.0,
+        line_width_max = 127.5,
+        has_scalar_alu = True,
+        has_coherent_ubwc_flag_caches = True,
+        has_isam_v = True,
+        has_ssbo_imm_offsets = True,
+        has_early_preamble = True,
+    )
+
+a7xx_gen2 = A7XXProps(
+        stsc_duplication_quirk = True,
+        has_event_write_sample_count = True,
+        ubwc_unorm_snorm_int_compatible = True,
+        supports_ibo_ubwc = True,
+        fs_must_have_non_zero_constlen_quirk = True,
+        # Most devices with a740 have blob v6xx which doesn't have
+        # this hint set. Match them for better compatibility by default.
+        enable_tp_ubwc_flag_hint = False,
+        has_64b_ssbo_atomics = True,
+    )
+
+add_gpus([
+        GPUId(chip_id=0x43030B00, name="FD735")
+    ], A6xxGPUInfo(
+        CHIP.A7XX,
+        [a7xx_base, a7xx_gen2],
+        num_ccu = 3,
+        tile_align_w = 96,
+        tile_align_h = 32,
+        num_vsc_pipes = 32,
+        cs_shared_mem_size = 32 * 1024,
+        wave_granularity = 2,
+        fibers_per_sp = 128 * 2 * 16,
+        magic_regs = dict(
+            TPL1_DBG_ECO_CNTL = 0x11100000,
+            GRAS_DBG_ECO_CNTL = 0x00004800,
+            SP_CHICKEN_BITS = 0x10001400,
+            UCHE_CLIENT_PF = 0x00000084,
+            PC_MODE_CNTL = 0x0000001f,
+            SP_DBG_ECO_CNTL = 0x10000000,
+            RB_DBG_ECO_CNTL = 0x00000001,
+            RB_DBG_ECO_CNTL_blit = 0x00000001,
+            RB_UNKNOWN_8E01 = 0x0,
+            VPC_DBG_ECO_CNTL = 0x02000000,
+            UCHE_UNKNOWN_0E12 = 0x00000000,
+
+            RB_UNKNOWN_8E06 = 0x02080000,
+        ),
+        raw_magic_regs = [
+            [A6XXRegs.REG_A6XX_UCHE_CACHE_WAYS, 0x00000000],
+            [A6XXRegs.REG_A6XX_TPL1_DBG_ECO_CNTL1, 0x00040724],
+
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_AE08, 0x00000400],
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_AE09, 0x00430800],
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_AE0A, 0x00000000],
+            [A6XXRegs.REG_A7XX_UCHE_UNKNOWN_0E10, 0x00000000],
+            [A6XXRegs.REG_A7XX_UCHE_UNKNOWN_0E11, 0x00000000],
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_AE6C, 0x00000000],
+            [A6XXRegs.REG_A6XX_PC_DBG_ECO_CNTL, 0x00100000],
+            [A6XXRegs.REG_A7XX_PC_UNKNOWN_9E24, 0x01585600],
+            [A6XXRegs.REG_A7XX_VFD_UNKNOWN_A600, 0x00008000],
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_AE06, 0x00000000],
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_AE6A, 0x00000000],
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_AE6B, 0x00000080],
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_AE73, 0x00000000],
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_AB02, 0x00000000],
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_AB01, 0x00000000],
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_AB22, 0x00000000],
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_B310, 0x00000000],
+
+            [A6XXRegs.REG_A7XX_GRAS_UNKNOWN_8120, 0x09510840],
+            [A6XXRegs.REG_A7XX_GRAS_UNKNOWN_8121, 0x00000a62],
+
+            [A6XXRegs.REG_A7XX_GRAS_UNKNOWN_8009, 0x00000000],
+            [A6XXRegs.REG_A7XX_GRAS_UNKNOWN_800A, 0x00000000],
+            [A6XXRegs.REG_A7XX_GRAS_UNKNOWN_800B, 0x00000000],
+            [A6XXRegs.REG_A7XX_GRAS_UNKNOWN_800C, 0x00000000],
+
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_0CE2,   0x00000000],
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_0CE2+1, 0x00000000],
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_0CE4,   0x00000000],
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_0CE4+1, 0x00000000],
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_0CE6,   0x00000000],
+            [A6XXRegs.REG_A7XX_SP_UNKNOWN_0CE6+1, 0x00000000],
+
+            [A6XXRegs.REG_A7XX_GRAS_UNKNOWN_80A7, 0x00000000],
+
+            [A6XXRegs.REG_A7XX_RB_UNKNOWN_8E79,   0x00000000],
+            [A6XXRegs.REG_A7XX_RB_UNKNOWN_8899,   0x00000000],
+            [A6XXRegs.REG_A7XX_RB_UNKNOWN_88F5,   0x00000000],
+            [A6XXRegs.REG_A7XX_RB_UNKNOWN_8C34,   0x00000000],
+
+            # Shading rate group
+            [A6XXRegs.REG_A6XX_RB_UNKNOWN_88F4,   0x00000000],
+            [A6XXRegs.REG_A7XX_HLSQ_UNKNOWN_A9AD, 0x00000000],
+            [A6XXRegs.REG_A7XX_GRAS_UNKNOWN_8008, 0x00000000],
+            [A6XXRegs.REG_A7XX_GRAS_UNKNOWN_80F4, 0x00000000],
+        ],
+    ))
+
 # Minimal definition needed for ir3 assembler/disassembler
 add_gpus([
         GPUId(730),
