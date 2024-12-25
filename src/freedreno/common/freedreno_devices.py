@@ -591,7 +591,7 @@ add_gpus([
             VPC_DBG_ECO_CNTL = 0x02000000,
             UCHE_UNKNOWN_0E12 = 0x00000000,
 
-            RB_UNKNOWN_8E06 = 0x02080000,
+            # RB_UNKNOWN_8E06 = 0x02080000, ???
         )
     ))
 
